@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+
+@layer utilities {
+  .break-after-page {
+    page-break-after: always;
+  }
+}
+
+#curriculo-pdf {
+  width: 794px;
+  max-width: 100%;
+  margin: auto;
+}
+
+@media print {
+  .no-shadow-print {
+    box-shadow: none !important;
+    border: none !important;
+  }
+}
