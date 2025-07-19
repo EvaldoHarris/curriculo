@@ -7,16 +7,28 @@ export default function PortfolioPage() {
   const [hoveredProject, setHoveredProject] = useState(null);
 
   const handleDownloadPDF = () => {
-    const element = document.getElementById("curriculo-pdf");
-    const buttonContainer = document.getElementById("baixar-pdf");
+  const element = document.getElementById("curriculo-pdf");
+  const buttonContainer = document.getElementById("baixar-pdf");
 
-    if (buttonContainer) buttonContainer.style.display = "none";
+  // Exibe mensagem de carregamento
+  const loading = document.createElement("div");
+  loading.id = "pdf-loading";
+  loading.innerText = "Gerando currículo PDF...";
+  loading.className = "fixed top-6 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded shadow z-50";
+  document.body.appendChild(loading);
 
+  // Oculta botão durante a geração
+  if (buttonContainer) buttonContainer.style.display = "none";
+
+  // Rola até o final da página
+  window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+
+  setTimeout(() => {
     const opt = {
-      margin: 0.5,
+      margin: 1,
       filename: "Curriculo_Evaldo_Harris.pdf",
       image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
+      html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
     };
 
@@ -25,9 +37,15 @@ export default function PortfolioPage() {
       .from(element)
       .save()
       .then(() => {
+        // Restaura interface após geração
         if (buttonContainer) buttonContainer.style.display = "flex";
+        window.scrollTo({ top: 0 });
+        const loadingElem = document.getElementById("pdf-loading");
+        if (loadingElem) loadingElem.remove();
       });
-  };
+  }, 1500); // Tempo para garantir renderização completa
+};
+
 
   const projetos = [
     {
@@ -120,40 +138,39 @@ export default function PortfolioPage() {
             <div className="grid sm:grid-cols-2 gap-6">
               {projetos.map((p, i) => (
                 <motion.div
-                key={i}
-                className="bg-white p-4 rounded-xl border border-gray-200 shadow hover:shadow-xl transition hover:scale-[1.015]"
-                whileHover={{ scale: 1.02 }}
-                onMouseEnter={() => setHoveredProject(p.link)}
-                onMouseLeave={() => setHoveredProject(null)}
-              >
-                <h4 className="font-semibold text-lg text-blue-800">{p.title}</h4>
-                <p className="text-sm text-gray-600">{p.desc}</p>
-                <a
-                  href={p.link}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-blue-600 text-sm underline mt-1 inline-block"
+                  key={i}
+                  className="bg-white p-4 rounded-xl border border-gray-200 shadow hover:shadow-xl transition hover:scale-[1.015]"
+                  whileHover={{ scale: 1.02 }}
+                  onMouseEnter={() => setHoveredProject(p.link)}
+                  onMouseLeave={() => setHoveredProject(null)}
                 >
-                  Ver projeto
-                </a>
+                  <h4 className="font-semibold text-lg text-blue-800">{p.title}</h4>
+                  <p className="text-sm text-gray-600">{p.desc}</p>
+                  <a
+                    href={p.link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-600 text-sm underline mt-1 inline-block"
+                  >
+                    Ver projeto
+                  </a>
 
-                {hoveredProject === p.link && p.link.includes("netlify") && (
-                  <div className="mt-4 border rounded-lg overflow-hidden">
-                    <iframe
-                      src={p.link}
-                      title={p.title}
-                      className="w-full h-[300px] border-0"
-                    />
-                  </div>
-                )}
-              </motion.div>
-
+                  {hoveredProject === p.link && p.link.includes("netlify") && (
+                    <div className="mt-4 border rounded-lg overflow-hidden">
+                      <iframe
+                        src={p.link}
+                        title={p.title}
+                        className="w-full h-[300px] border-0"
+                      />
+                    </div>
+                  )}
+                </motion.div>
               ))}
             </div>
           </Section>
 
           <Section title="Habilidades Técnicas" fromRight>
-            <div className="grid sm:grid-cols-3 gap-6 text-sm text-gray-700">
+            <div className="grid sm:grid-cols-3 gap-6 text-sm text-gray-700" style={{ marginBottom: '20px'}}>
               <SkillGroup title="Frontend" skills={["React.js", "Angular", "HTML5", "CSS3", "Tailwind", "Framer Motion"]} />
               <SkillGroup title="Backend" skills={["Node.js", "Python", "Flask", "ASP.NET", "REST API", "WebSocket"]} />
               <SkillGroup title="DevOps & Outros" skills={["Docker", "Git", "CI/CD", "Firebase", "PostgreSQL", "ASAAS", "DocuSign"]} />
