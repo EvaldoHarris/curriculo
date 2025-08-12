@@ -170,10 +170,52 @@ export default function PortfolioPage() {
           </Section>
 
           <Section title="Habilidades Técnicas" fromRight>
-            <div className="grid sm:grid-cols-3 gap-6 text-sm text-gray-700" style={{ marginBottom: '20px'}}>
-              <SkillGroup title="Frontend" skills={["React.js", "Angular", "HTML5", "CSS3", "Tailwind", "Framer Motion"]} />
-              <SkillGroup title="Backend" skills={["Node.js", "Python", "Flask", "ASP.NET", "REST API", "WebSocket"]} />
-              <SkillGroup title="DevOps & Outros" skills={["Docker", "Git", "CI/CD", "Firebase", "PostgreSQL", "ASAAS", "DocuSign"]} />
+            <div className="grid sm:grid-cols-4 gap-6 text-sm text-gray-700" style={{ marginBottom: '20px'}}>
+              <SkillGroup 
+                title="Linguagens" 
+                skills={[
+                  "JavaScript", 
+                  "TypeScript", 
+                  "Java", 
+                  "Kotlin", 
+                  "Python", 
+                  "C#", 
+                  "SQL"
+                ]} 
+              />
+              <SkillGroup 
+                title="Frontend" 
+                skills={[
+                  "React.js", 
+                  "Angular", 
+                  "HTML5", 
+                  "CSS3", 
+                  "Tailwind", 
+                  "Framer Motion"
+                ]} 
+              />
+              <SkillGroup 
+                title="Backend" 
+                skills={[
+                  "Node.js", 
+                  "Flask", 
+                  "ASP.NET", 
+                  "REST API", 
+                  "WebSocket"
+                ]} 
+              />
+              <SkillGroup 
+                title="DevOps & Outros" 
+                skills={[
+                  "Docker", 
+                  "Git", 
+                  "CI/CD", 
+                  "Firebase", 
+                  "PostgreSQL", 
+                  "ASAAS", 
+                  "DocuSign"
+                ]} 
+              />
             </div>
           </Section>
         </main>
