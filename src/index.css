@@ -20,6 +20,14 @@
   margin: auto;
 }
 
+/* Evita que títulos/seções sejam "cortados" no PDF (html2pdf/jsPDF). */
+#curriculo-pdf section,
+#curriculo-pdf h2,
+#curriculo-pdf h3 {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
 @media print {
   .no-shadow-print {
     box-shadow: none !important;
