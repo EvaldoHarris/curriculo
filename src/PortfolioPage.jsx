@@ -99,8 +99,7 @@ export default function PortfolioPage() {
         <main className="max-w-5xl mx-auto space-y-20">
           <Section title="Resumo Profissional" fromLeft>
             <p className="text-base leading-relaxed text-gray-700">
-              Desenvolvedor com ampla experiência em projetos web, mobile e IoT. Especializado em automações com IA, APIs performáticas e testes com Playwright. Forte perfil autodidata e foco em entrega de soluções inovadoras com qualidade e eficiência.
-            </p>
+              Desenvolvedor Full Stack com experiência em projetos web, mobile e IoT, atuando na criação de aplicações completas, APIs performáticas, integrações com serviços externos. Possuo experiência no desenvolvimento de soluções ponta a ponta, envolvendo frontend, backend, banco de dados e comunicação com dispositivos embarcados. Tenho perfil autodidata, adaptação rápida a novas tecnologias e foco em entregar soluções inovadoras, funcionais e com alta qualidade.            </p>
           </Section>
 
           <Section title="Experiência Profissional" fromRight>
