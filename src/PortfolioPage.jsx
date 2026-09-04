@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   FaArrowRight,
@@ -10,7 +9,6 @@ import {
   FaLinkedin,
   FaMapMarkerAlt,
 } from "react-icons/fa";
-import html2pdf from "html2pdf.js";
 
 const projects = [
   {
@@ -140,32 +138,6 @@ const fadeUp = {
 };
 
 export default function PortfolioPage() {
-  const [isGenerating, setIsGenerating] = useState(false);
-
-  const handleDownloadPDF = async () => {
-    const element = document.getElementById("curriculo-pdf");
-    if (!element || isGenerating) return;
-    setIsGenerating(true);
-    document.body.classList.add("exporting-pdf");
-
-    try {
-      await html2pdf()
-        .set({
-          margin: [0.35, 0.35, 0.35, 0.35],
-          filename: "Curriculo_Evaldo_Harris.pdf",
-          image: { type: "jpeg", quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true, backgroundColor: "#07100f" },
-          jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
-          pagebreak: { mode: ["avoid-all", "css", "legacy"] },
-        })
-        .from(element)
-        .save();
-    } finally {
-      document.body.classList.remove("exporting-pdf");
-      setIsGenerating(false);
-    }
-  };
-
   return (
     <div className="site-shell">
       <div className="ambient ambient-one" aria-hidden="true" />
@@ -325,10 +297,9 @@ export default function PortfolioPage() {
         </footer>
       </div>
 
-      <button type="button" className="pdf-button no-print" onClick={handleDownloadPDF} disabled={isGenerating} aria-label="Baixar currículo em PDF">
-        {isGenerating ? <span className="loader" /> : <FaDownload aria-hidden="true" />}
-        {isGenerating ? "Gerando PDF..." : "Baixar currículo"}
-      </button>
+      <a className="pdf-button no-print" href="/curriculo/Curriculo_Evaldo_Harris.pdf" download aria-label="Baixar currículo em PDF">
+        <FaDownload aria-hidden="true" /> Baixar currículo
+      </a>
     </div>
   );
 }
