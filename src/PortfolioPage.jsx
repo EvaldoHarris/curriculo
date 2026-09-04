@@ -1,4 +1,5 @@
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   FaArrowRight,
   FaCode,
@@ -137,7 +138,25 @@ const fadeUp = {
   visible: { opacity: 1, y: 0 },
 };
 
+const previewUrl = (link) =>
+  `https://api.microlink.io/?url=${encodeURIComponent(link)}&screenshot=true&meta=false&embed=screenshot.url`;
+
 export default function PortfolioPage() {
+  const [hoveredProject, setHoveredProject] = useState(null);
+
+  useEffect(() => {
+    // Microlink gera a screenshot sob demanda; a 1ª chamada por site é lenta.
+    // Pré-aquecemos o cache em segundo plano (escalonado) para que o hover
+    // já mostre a imagem pronta em vez de esperar a geração.
+    const timers = projects.map((project, index) =>
+      setTimeout(() => {
+        const img = new Image();
+        img.src = previewUrl(project.link);
+      }, 800 + index * 350)
+    );
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
   return (
     <div className="site-shell">
       <div className="ambient ambient-one" aria-hidden="true" />
@@ -189,7 +208,7 @@ export default function PortfolioPage() {
 
           <section className="profile-strip" aria-label="Informações de contato">
             <a href="https://maps.google.com/?q=Itapetininga%20SP" target="_blank" rel="noreferrer"><FaMapMarkerAlt aria-hidden="true" /> Itapetininga, SP</a>
-            <a href="tel:+5515996015410">+55 15 99601-5410</a>
+            <a href="https://wa.me/5515996015410" target="_blank" rel="noreferrer">+55 15 99601-5410</a>
             <a href="mailto:evaldo.joaoj@hotmail.com">evaldo.joaoj@hotmail.com</a>
             <div className="social-links no-print">
               <a href="https://github.com/EvaldoHarris" target="_blank" rel="noreferrer" aria-label="GitHub"><FaGithub /></a>
@@ -236,6 +255,10 @@ export default function PortfolioPage() {
                   variants={fadeUp}
                   transition={{ duration: 0.45, delay: (position % 4) * 0.04 }}
                   aria-label={`Abrir projeto ${project.title}`}
+                  onHoverStart={() => setHoveredProject(project.link)}
+                  onHoverEnd={() => setHoveredProject(null)}
+                  onFocus={() => setHoveredProject(project.link)}
+                  onBlur={() => setHoveredProject(null)}
                 >
                   <div className="project-topline"><span>{project.index}</span><FaExternalLinkAlt aria-hidden="true" /></div>
                   <div className="project-content">
@@ -244,6 +267,20 @@ export default function PortfolioPage() {
                     <p>{project.description}</p>
                   </div>
                   <div className="project-footer"><span>Ver projeto</span><span className="project-line" /></div>
+                  <AnimatePresence>
+                    {hoveredProject === project.link && (
+                      <motion.div
+                        className="project-preview no-print"
+                        initial={{ opacity: 0, scale: 0.94, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.96, y: 6 }}
+                        transition={{ duration: 0.22, ease: "easeOut" }}
+                        aria-hidden="true"
+                      >
+                        <img src={previewUrl(project.link)} alt="" loading="lazy" />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </motion.a>
               ))}
             </div>
