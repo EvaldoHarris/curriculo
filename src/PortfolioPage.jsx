@@ -1,274 +1,338 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { FaGithub, FaLinkedin, FaGitlab, FaFilePdf } from "react-icons/fa";
+import {
+  FaArrowRight,
+  FaCode,
+  FaDownload,
+  FaExternalLinkAlt,
+  FaGithub,
+  FaGitlab,
+  FaLinkedin,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
 import html2pdf from "html2pdf.js";
 
-export default function PortfolioPage() {
-  const [hoveredProject, setHoveredProject] = useState(null);
+const projects = [
+  {
+    title: "Assistente de Códigos",
+    description: "Assistente inteligente para consulta e organização de códigos de produtos.",
+    link: "https://assistente-codigos.netlify.app/",
+    type: "IA & automação",
+    index: "01",
+    featured: true,
+  },
+  {
+    title: "FTA Brasil",
+    description: "Plataforma web criada para centralizar a experiência digital da FTA Brasil.",
+    link: "https://ftabrasil.netlify.app/",
+    type: "Plataforma web",
+    index: "02",
+    featured: true,
+  },
+  {
+    title: "RFID Platform",
+    description: "Solução para gestão, rastreabilidade e operação de dispositivos RFID.",
+    link: "https://rfidplatform.netlify.app/",
+    type: "IoT & dados",
+    index: "03",
+    featured: true,
+  },
+  {
+    title: "Radar Emocional",
+    description: "Experiência digital para acompanhamento de percepções e indicadores emocionais.",
+    link: "https://radar-emocional.netlify.app/",
+    type: "IA & análise",
+    index: "04",
+    featured: true,
+  },
+  {
+    title: "Participia",
+    description: "Central do cidadão para solicitações urbanas, protocolos e gestão pública.",
+    link: "https://participia.com.br/",
+    type: "GovTech",
+    index: "05",
+  },
+  {
+    title: "Mais Emprego",
+    description: "Ecossistema de vagas, cursos, candidatos e gestão pública em uma só plataforma.",
+    link: "https://maisemprego.online/",
+    type: "HR Tech",
+    index: "06",
+  },
+  {
+    title: "EmpregaMais Resende",
+    description: "Portal municipal que aproxima oportunidades profissionais e talentos locais.",
+    link: "https://emprega-maisbr.netlify.app/",
+    type: "Empregabilidade",
+    index: "07",
+  },
+  {
+    title: "AlphaPark",
+    description: "Experiência digital para o empreendimento AlphaPark, em Resende.",
+    link: "https://alphaparkresende.netlify.app/",
+    type: "Produto digital",
+    index: "08",
+  },
+  {
+    title: "Airsoft QG",
+    description: "Plataforma completa para gerenciamento e organização de jogos de airsoft.",
+    link: "https://airsoftqg.netlify.app",
+    type: "Plataforma web",
+    index: "09",
+  },
+  {
+    title: "Airsoft App",
+    description: "Aplicativo Android nativo para controle e organização de exércitos.",
+    link: "https://play.google.com/store/apps/details?id=com.harris.evaldo.airsoft",
+    type: "Android",
+    index: "10",
+  },
+  {
+    title: "Calcular Preço App",
+    description: "Simulador de preços com cálculo e ajuste automático para dispositivos móveis.",
+    link: "https://play.google.com/store/apps/details?id=com.harris.evaldo.cotacao",
+    type: "Android",
+    index: "11",
+  },
+  {
+    title: "Flappy Ship",
+    description: "Jogo mobile 2D com mecânicas inspiradas no clássico Flappy Bird.",
+    link: "https://play.google.com/store/apps/details?id=com.harris.evaldo.flappyship",
+    type: "Game dev",
+    index: "12",
+  },
+];
 
-  const handleDownloadPDF = () => {
-  const element = document.getElementById("curriculo-pdf");
-  const buttonContainer = document.getElementById("baixar-pdf");
+const skillGroups = [
+  { title: "Linguagens", skills: ["JavaScript", "TypeScript", "Python", "Java", "Kotlin", "C#", "SQL"] },
+  { title: "Interfaces", skills: ["React", "Angular", "React Native", "HTML5", "CSS3", "Tailwind", "Framer Motion"] },
+  { title: "Backend", skills: ["Node.js", "Flask", "ASP.NET", "REST APIs", "WebSocket", "PostgreSQL"] },
+  { title: "Infra & integrações", skills: ["Docker", "Git", "CI/CD", "Firebase", "Playwright", "ASAAS", "DocuSign"] },
+];
 
-  // Exibe mensagem de carregamento
-  const loading = document.createElement("div");
-  loading.id = "pdf-loading";
-  loading.innerText = "Gerando currículo PDF...";
-  loading.className = "fixed top-6 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded shadow z-50";
-  document.body.appendChild(loading);
+const experiences = [
+  {
+    company: "Angulare",
+    role: "Desenvolvedor Full-Stack",
+    period: "Nov 2024 — atual",
+    tasks: [
+      "Interfaces Angular para sistemas empresariais",
+      "APIs Python integradas a modelos de inteligência artificial",
+      "Aplicações React Native com backend integrado",
+      "Automação de testes E2E com Playwright e LLMs",
+    ],
+  },
+  {
+    company: "Symtropy",
+    role: "Desenvolvedor Full-Stack",
+    period: "2021 — Nov 2024",
+    tasks: [
+      "Aplicações React e Node.js com recursos de IA",
+      "Reconhecimento facial e análise de vídeo",
+      "Suporte técnico e evolução de sistemas críticos",
+    ],
+  },
+];
 
-  // Oculta botão durante a geração
-  if (buttonContainer) buttonContainer.style.display = "none";
-
-  // Rola até o final da página
-  window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-
-  setTimeout(() => {
-    const opt = {
-      margin: 1,
-      filename: "Curriculo_Evaldo_Harris.pdf",
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
-      pagebreak: { mode: ["avoid-all", "css", "legacy"] },
-    };
-
-    html2pdf()
-      .set(opt)
-      .from(element)
-      .save()
-      .then(() => {
-        // Restaura interface após geração
-        if (buttonContainer) buttonContainer.style.display = "flex";
-        window.scrollTo({ top: 0 });
-        const loadingElem = document.getElementById("pdf-loading");
-        if (loadingElem) loadingElem.remove();
-      });
-  }, 1500); // Tempo para garantir renderização completa
+const fadeUp = {
+  hidden: { opacity: 0, y: 22 },
+  visible: { opacity: 1, y: 0 },
 };
 
+export default function PortfolioPage() {
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  const projetos = [
-    {
-      title: "Airsoft QG",
-      desc: "Plataforma completa para gerenciamento de jogos",
-      link: "https://airsoftqg.netlify.app",
-    },
-    {
-      title: "Airsoft App",
-      desc: "Aplicativo nativo para controle de exércitos",
-      link: "https://play.google.com/store/apps/details?id=com.harris.evaldo.airsoft",
-    },
-    {
-      title: "Calcular Preço App",
-      desc: "Simulador de preços com ajuste automático",
-      link: "https://play.google.com/store/apps/details?id=com.harris.evaldo.cotacao",
-    },
-    {
-      title: "Flappy Ship",
-      desc: "Jogo 2D inspirado em Flappy Bird",
-      link: "https://play.google.com/store/apps/details?id=com.harris.evaldo.flappyship",
+  const handleDownloadPDF = async () => {
+    const element = document.getElementById("curriculo-pdf");
+    if (!element || isGenerating) return;
+    setIsGenerating(true);
+    document.body.classList.add("exporting-pdf");
+
+    try {
+      await html2pdf()
+        .set({
+          margin: [0.35, 0.35, 0.35, 0.35],
+          filename: "Curriculo_Evaldo_Harris.pdf",
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, backgroundColor: "#07100f" },
+          jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+          pagebreak: { mode: ["avoid-all", "css", "legacy"] },
+        })
+        .from(element)
+        .save();
+    } finally {
+      document.body.classList.remove("exporting-pdf");
+      setIsGenerating(false);
     }
-  ];
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-100 text-gray-800 px-6 sm:px-16 py-10 font-sans relative">
+    <div className="site-shell">
+      <div className="ambient ambient-one" aria-hidden="true" />
+      <div className="ambient ambient-two" aria-hidden="true" />
+
+      <header className="topbar no-print">
+        <a className="brand-mark" href="#inicio" aria-label="Ir para o início">EH<span>/</span>DEV</a>
+        <nav aria-label="Navegação principal">
+          <a href="#sobre">Sobre</a>
+          <a href="#projetos">Projetos</a>
+          <a href="#experiencia">Experiência</a>
+        </nav>
+        <a className="topbar-contact" href="mailto:evaldo.joaoj@hotmail.com">
+          Vamos conversar <FaArrowRight aria-hidden="true" />
+        </a>
+      </header>
+
       <div id="curriculo-pdf">
-        <motion.header
-          className="text-center mb-8"
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 leading-tight">
-            Evaldo João Harris dos Santos Junior
-          </h1>
-          <p className="mt-3 text-lg text-gray-600">
-            Desenvolvedor Full-Stack • Especialista em IA e Automação
-          </p>
-          <p className="text-sm text-gray-500">
-            Itapetininga/SP • (15) 99601-5410 • evaldo.joaoj@hotmail.com
-          </p>
+        <main>
+          <section className="hero" id="inicio">
+            <motion.div className="hero-copy" initial="hidden" animate="visible" variants={fadeUp} transition={{ duration: 0.65 }}>
+              <div className="eyebrow"><span /> Disponível para novos desafios</div>
+              <p className="hero-kicker">FULL-STACK · IA · AUTOMAÇÃO · IOT</p>
+              <h1>Evaldo Harris<span>transforma ideias em produtos digitais.</span></h1>
+              <p className="hero-intro">
+                Engenheiro da Computação e desenvolvedor Full-Stack focado em criar aplicações completas,
+                inteligentes e preparadas para escalar.
+              </p>
+              <div className="hero-actions no-print">
+                <a className="primary-button" href="#projetos">Explorar projetos <FaArrowRight aria-hidden="true" /></a>
+                <a className="secondary-button" href="mailto:evaldo.joaoj@hotmail.com">Entrar em contato</a>
+              </div>
+            </motion.div>
 
-          <div className="flex justify-center gap-6 mt-6 text-blue-700 text-2xl">
-            <a href="https://github.com/EvaldoHarris" target="_blank" rel="noreferrer" title="GitHub"><FaGithub /></a>
-            <a href="https://gitlab.com/Evaldo_Harris" target="_blank" rel="noreferrer" title="GitLab"><FaGitlab /></a>
-            <a href="https://www.linkedin.com/in/evaldo-harris-01494829/" target="_blank" rel="noreferrer" title="LinkedIn"><FaLinkedin /></a>
-          </div>
-        </motion.header>
+            <motion.aside className="profile-console" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.65, delay: 0.12 }} aria-label="Resumo do perfil">
+              <div className="console-bar"><div><i /><i /><i /></div><span>profile.json</span></div>
+              <div className="console-body" aria-hidden="true">
+                <p><b>const</b> developer = {'{'}</p>
+                <p className="indent"><em>name</em>: <span>"Evaldo Harris"</span>,</p>
+                <p className="indent"><em>role</em>: <span>"Full-Stack Developer"</span>,</p>
+                <p className="indent"><em>focus</em>: [<span>"AI"</span>, <span>"Web"</span>, <span>"IoT"</span>],</p>
+                <p className="indent"><em>location</em>: <span>"Itapetininga, SP"</span>,</p>
+                <p className="indent"><em>status</em>: <strong>"building"</strong></p>
+                <p>{'}'};</p>
+              </div>
+              <div className="console-status"><span /> SYSTEM ONLINE</div>
+            </motion.aside>
+          </section>
 
-        <main className="max-w-5xl mx-auto space-y-20">
-          <Section title="Resumo Profissional" fromLeft>
-            <p className="text-base leading-relaxed text-gray-700">
-              Desenvolvedor Full Stack com experiência em projetos web, mobile e IoT, atuando na criação de aplicações completas, APIs performáticas, integrações com serviços externos. Possuo experiência no desenvolvimento de soluções ponta a ponta, envolvendo frontend, backend, banco de dados e comunicação com dispositivos embarcados. Tenho perfil autodidata, adaptação rápida a novas tecnologias e foco em entregar soluções inovadoras, funcionais e com alta qualidade.            </p>
-          </Section>
+          <section className="profile-strip" aria-label="Informações de contato">
+            <a href="https://maps.google.com/?q=Itapetininga%20SP" target="_blank" rel="noreferrer"><FaMapMarkerAlt aria-hidden="true" /> Itapetininga, SP</a>
+            <a href="tel:+5515996015410">+55 15 99601-5410</a>
+            <a href="mailto:evaldo.joaoj@hotmail.com">evaldo.joaoj@hotmail.com</a>
+            <div className="social-links no-print">
+              <a href="https://github.com/EvaldoHarris" target="_blank" rel="noreferrer" aria-label="GitHub"><FaGithub /></a>
+              <a href="https://gitlab.com/Evaldo_Harris" target="_blank" rel="noreferrer" aria-label="GitLab"><FaGitlab /></a>
+              <a href="https://www.linkedin.com/in/evaldo-harris-01494829/" target="_blank" rel="noreferrer" aria-label="LinkedIn"><FaLinkedin /></a>
+            </div>
+          </section>
 
-          <Section title="Experiência Profissional" fromRight>
-            <ExperienceItem
-              company="Angulare"
-              role="Desenvolvedor Full-Stack"
-              period="Nov/2024 – Atual"
-              tasks={[
-                "Frontend com Angular para sistemas empresariais",
-                "APIs em Python com integração com modelos de IA",
-                "Apps mobile com React Native e backend integrado",
-                "Automação de testes E2E com Playwright e LLM",
-              ]}
-            />
-            <ExperienceItem
-              company="Symtropy"
-              role="Desenvolvedor Full-Stack"
-              period="2021 – Nov/2024"
-              tasks={[
-                "Sistemas React + Node.js com foco em IA",
-                "Projetos com reconhecimento facial e análise de vídeo",
-                "Suporte técnico e evolução de sistemas críticos",
-              ]}
-            />
-          </Section>
+          <section className="content-section about-section" id="sobre">
+            <SectionHeading number="01" label="Perfil" title="Código com visão de produto." />
+            <div className="about-grid">
+              <p className="lead-copy">
+                Desenvolvo soluções ponta a ponta — da interface e arquitetura de APIs à integração com
+                inteligência artificial, bancos de dados e dispositivos embarcados.
+              </p>
+              <div className="about-detail">
+                <p>
+                  Minha experiência combina projetos web, mobile e IoT com atuação em sistemas empresariais
+                  e produtos digitais. Tenho perfil autodidata, adaptação rápida e atenção especial à qualidade
+                  da experiência entregue.
+                </p>
+                <div className="metric-row">
+                  <div><strong>5+</strong><span>anos criando software</span></div>
+                  <div><strong>12</strong><span>projetos publicados</span></div>
+                  <div><strong>360°</strong><span>visão de produto</span></div>
+                </div>
+              </div>
+            </div>
+          </section>
 
-          <Section title="Formação Acadêmica" fromLeft>
-            <p className="text-gray-700">
-              Engenharia da Computação – <strong>FACENS</strong>{" "}
-              <span className="text-sm text-gray-500">(Concluído em Dez/2021)</span>
-            </p>
-          </Section>
-
-          <Section title="Projetos em Destaque" fromBottom>
-            <div className="grid sm:grid-cols-2 gap-6">
-              {projetos.map((p, i) => (
-                <motion.div
-                  key={i}
-                  className="bg-white p-4 rounded-xl border border-gray-200 shadow hover:shadow-xl transition hover:scale-[1.015]"
-                  whileHover={{ scale: 1.02 }}
-                  onMouseEnter={() => setHoveredProject(p.link)}
-                  onMouseLeave={() => setHoveredProject(null)}
+          <section className="content-section projects-section" id="projetos">
+            <SectionHeading number="02" label="Portfólio" title="Produtos que já estão no mundo." />
+            <div className="projects-grid">
+              {projects.map((project, position) => (
+                <motion.a
+                  className={`project-card ${project.featured ? "featured" : ""}`}
+                  href={project.link}
+                  target="_blank"
+                  rel="noreferrer"
+                  key={project.link}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.15 }}
+                  variants={fadeUp}
+                  transition={{ duration: 0.45, delay: (position % 4) * 0.04 }}
+                  aria-label={`Abrir projeto ${project.title}`}
                 >
-                  <h4 className="font-semibold text-lg text-blue-800">{p.title}</h4>
-                  <p className="text-sm text-gray-600">{p.desc}</p>
-                  <a
-                    href={p.link}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-blue-600 text-sm underline mt-1 inline-block"
-                  >
-                    Ver projeto
-                  </a>
-
-                  {hoveredProject === p.link && p.link.includes("netlify") && (
-                    <div className="mt-4 border rounded-lg overflow-hidden">
-                      <iframe
-                        src={p.link}
-                        title={p.title}
-                        className="w-full h-[300px] border-0"
-                      />
-                    </div>
-                  )}
-                </motion.div>
+                  <div className="project-topline"><span>{project.index}</span><FaExternalLinkAlt aria-hidden="true" /></div>
+                  <div className="project-content">
+                    <span className="project-type">{project.type}</span>
+                    <h3>{project.title}</h3>
+                    <p>{project.description}</p>
+                  </div>
+                  <div className="project-footer"><span>Ver projeto</span><span className="project-line" /></div>
+                </motion.a>
               ))}
             </div>
-          </Section>
+          </section>
 
-          <Section title="Habilidades Técnicas" fromRight>
-            <div className="grid sm:grid-cols-4 gap-6 text-sm text-gray-700" style={{ marginBottom: '20px'}}>
-              <SkillGroup 
-                title="Linguagens" 
-                skills={[
-                  "JavaScript", 
-                  "TypeScript", 
-                  "Java", 
-                  "Kotlin", 
-                  "Python", 
-                  "C#", 
-                  "SQL"
-                ]} 
-              />
-              <SkillGroup 
-                title="Frontend" 
-                skills={[
-                  "React.js", 
-                  "Angular", 
-                  "HTML5", 
-                  "CSS3", 
-                  "Tailwind", 
-                  "Framer Motion"
-                ]} 
-              />
-              <SkillGroup 
-                title="Backend" 
-                skills={[
-                  "Node.js", 
-                  "Flask", 
-                  "ASP.NET", 
-                  "REST API", 
-                  "WebSocket"
-                ]} 
-              />
-              <SkillGroup 
-                title="DevOps & Outros" 
-                skills={[
-                  "Docker", 
-                  "Git", 
-                  "CI/CD", 
-                  "Firebase", 
-                  "PostgreSQL", 
-                  "ASAAS", 
-                  "DocuSign"
-                ]} 
-              />
+          <section className="content-section experience-section" id="experiencia">
+            <SectionHeading number="03" label="Trajetória" title="Experiência que conecta disciplinas." />
+            <div className="experience-layout">
+              <div className="timeline">
+                {experiences.map((experience) => (
+                  <article className="experience-item" key={experience.company}>
+                    <div className="timeline-dot" />
+                    <div className="experience-heading">
+                      <div><span>{experience.company}</span><h3>{experience.role}</h3></div>
+                      <time>{experience.period}</time>
+                    </div>
+                    <ul>{experience.tasks.map((task) => <li key={task}>{task}</li>)}</ul>
+                  </article>
+                ))}
+                <article className="experience-item education-item">
+                  <div className="timeline-dot" />
+                  <div className="experience-heading">
+                    <div><span>FACENS</span><h3>Engenharia da Computação</h3></div>
+                    <time>Concluído em Dez 2021</time>
+                  </div>
+                </article>
+              </div>
+
+              <aside className="skills-panel">
+                <div className="skills-title"><FaCode aria-hidden="true" /> STACK TÉCNICA</div>
+                {skillGroups.map((group) => (
+                  <div className="skill-group" key={group.title}>
+                    <h3>{group.title}</h3>
+                    <div className="skill-list">{group.skills.map((skill) => <span key={skill}>{skill}</span>)}</div>
+                  </div>
+                ))}
+              </aside>
             </div>
-          </Section>
+          </section>
+
+          <section className="contact-section">
+            <div><span className="contact-label">PRÓXIMO PROJETO</span><h2>Vamos construir algo relevante?</h2></div>
+            <a className="contact-link" href="mailto:evaldo.joaoj@hotmail.com">evaldo.joaoj@hotmail.com <FaArrowRight aria-hidden="true" /></a>
+          </section>
         </main>
+
+        <footer>
+          <div className="footer-brand">EH<span>/</span>DEV</div>
+          <p>© {new Date().getFullYear()} Evaldo Harris</p>
+          <p>Engenharia · Produto · Tecnologia</p>
+        </footer>
       </div>
 
-      <div className="fixed bottom-6 right-6 z-50">
-        <button
-          id='baixar-pdf'
-          onClick={handleDownloadPDF}
-          className="px-4 py-2 bg-green-600 text-white text-sm rounded-full shadow-lg hover:bg-green-700 transition"
-        >
-          <FaFilePdf className="inline mr-2" /> Baixar PDF
-        </button>
-      </div>
-
-      <footer className="text-center text-xs text-gray-500 mt-24 border-t pt-6">
-        <p>© {new Date().getFullYear()} Evaldo Harris – Todos os direitos reservados.</p>
-      </footer>
+      <button type="button" className="pdf-button no-print" onClick={handleDownloadPDF} disabled={isGenerating} aria-label="Baixar currículo em PDF">
+        {isGenerating ? <span className="loader" /> : <FaDownload aria-hidden="true" />}
+        {isGenerating ? "Gerando PDF..." : "Baixar currículo"}
+      </button>
     </div>
   );
 }
 
-const Section = ({ title, children, fromLeft, fromRight, fromBottom }) => (
-  <motion.section
-    initial={{ opacity: 0, x: fromLeft ? -30 : fromRight ? 30 : 0, y: fromBottom ? 30 : 0 }}
-    whileInView={{ opacity: 1, x: 0, y: 0 }}
-    viewport={{ once: true }}
-    transition={{ duration: 0.5 }}
-    className="mb-16"
-  >
-    <h2 className="text-2xl font-bold mb-4 relative inline-block">
-      <span className="pb-1 border-b-2 border-blue-600">{title}</span>
-    </h2>
-    {children}
-  </motion.section>
-);
-
-const ExperienceItem = ({ company, role, period, tasks }) => (
-  <div className="mb-6">
-    <h3 className="text-lg font-semibold text-gray-800">
-      {company} – {role} <span className="text-sm text-gray-500">({period})</span>
-    </h3>
-    <ul className="list-disc ml-5 text-sm text-gray-700 space-y-1 mt-1">
-      {tasks.map((task, idx) => <li key={idx}>{task}</li>)}
-    </ul>
-  </div>
-);
-
-const SkillGroup = ({ title, skills }) => (
-  <div>
-    <h4 className="font-semibold text-gray-800 mb-1">{title}</h4>
-    <ul className="list-disc list-inside space-y-1">
-      {skills.map((skill, i) => <li key={i}>{skill}</li>)}
-    </ul>
-  </div>
-);
+function SectionHeading({ number, label, title }) {
+  return <div className="section-heading"><div className="section-id"><span>{number}</span> {label}</div><h2>{title}</h2></div>;
+}
